@@ -30,13 +30,13 @@ public class CredhubberController {
     }
 
     @JsonAnyGetter
-    @PostMapping(path = "/write/{name}", consumes = "application/json", produces = "application/json")
-    public Map<String, Object> writeCredential(@PathVariable String name, @RequestBody Map<String, Object> cred ) {
+    @PostMapping(path = "/write", consumes = "application/json", produces = "application/json")
+    public Map<String, Object> writeCredential( @RequestBody Secret cred ) {
 
         try {
             JsonCredentialRequest request = JsonCredentialRequest.builder()
-                    .name(new SimpleCredentialName(name))
-                    .value(cred).build();
+                    .name(new SimpleCredentialName(cred.name))
+                    .value(cred.value).build();
 
             CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write(request);
             System.out.println("Successfully wrote credentials: " + credentialDetails);
