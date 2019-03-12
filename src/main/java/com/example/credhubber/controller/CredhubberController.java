@@ -9,6 +9,7 @@ import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.json.JsonCredential;
 import org.springframework.credhub.support.json.JsonCredentialRequest;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -27,6 +28,13 @@ public class CredhubberController {
     @GetMapping("/hello")
     public String hello() {
         return "hi";
+    }
+
+    @GetMapping("/")
+    public String index( Model model ) {
+        Secret secret = new Secret();
+        model.addAttribute( "user", secret );
+        return "index";
     }
 
     @JsonAnyGetter
