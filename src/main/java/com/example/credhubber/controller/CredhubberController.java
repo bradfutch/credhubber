@@ -1,6 +1,7 @@
 package com.example.credhubber.controller;
 
 import com.example.credhubber.domain.Secret;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.credhub.core.CredHubOperations;
@@ -28,8 +29,9 @@ public class CredhubberController {
         return "hi";
     }
 
+    @JsonAnyGetter
     @PostMapping(path = "/write/{name}", consumes = "application/json", produces = "application/json")
-    public String writeCredential(@PathVariable String name, @RequestBody Map<String, Object> cred ) {
+    public Map<String, Object> writeCredential(@PathVariable String name, @RequestBody Map<String, Object> cred ) {
 
         try {
             JsonCredentialRequest request = JsonCredentialRequest.builder()
@@ -39,25 +41,30 @@ public class CredhubberController {
             CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write(request);
             System.out.println("Successfully wrote credentials: " + credentialDetails);
 
-            return "wrote succesfully : \n" + credentialDetails.toString();
+            return credentialDetails.getValue();
         } catch (Exception e) {
             System.out.println("Error writing credentials: " + e.getMessage());
-            return "FAILED : " + e.getMessage();
+            Map<String,Object> thing =  new HashMap<String,Object>();
+            thing.put("failed", e.getMessage());
+            return thing;
         }
     }
 
+    @JsonAnyGetter
     @GetMapping("/fetch/{id}")
-    public String getCredential(@PathVariable String id) {
+    public Map<String,Object> getCredential(@PathVariable String id) {
 
         try {
             CredentialDetails<JsonCredential> retrievedDetails =
                     credHubOperations.credentials().getById(id, JsonCredential.class);
             System.out.println("Successfully retrieved credentials by ID: " + retrievedDetails);
 
-            return retrievedDetails.toString();
+            return retrievedDetails.getValue();
         } catch (Exception e) {
             System.out.println("Error retrieving credentials by ID: " + e.getMessage());
-            return "Error : " + e.getMessage();
+            Map<String,Object> thing =  new HashMap<String,Object>();
+            thing.put("failed", e.getMessage());
+            return thing;
         }
     }
 }
