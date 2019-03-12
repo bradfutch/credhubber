@@ -1,20 +1,15 @@
 package com.example.credhubber.controller;
 
-import com.example.credhubber.domain.Secret;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.credhub.core.CredHubOperations;
 import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.json.JsonCredential;
 import org.springframework.credhub.support.json.JsonCredentialRequest;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 @RestController
 public class CredhubberController {
@@ -25,19 +20,14 @@ public class CredhubberController {
         this.credHubOperations = credHubOperations;
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "hi";
-    }
-
     @JsonAnyGetter
-    @PostMapping(path = "/write", consumes = "application/json", produces = "application/json")
-    public Map<String, Object> writeCredential( @RequestBody Secret cred ) {
+    @PostMapping(path = "/write/{name}", consumes = "application/json", produces = "application/json")
+    public Map<String, Object> writeCredential( @PathVariable String name, @RequestBody Map<String, Object> cred ) {
 
         try {
             JsonCredentialRequest request = JsonCredentialRequest.builder()
-                    .name(new SimpleCredentialName(cred.name))
-                    .value(cred.value).build();
+                    .name(new SimpleCredentialName(name))
+                    .value(cred).build();
 
             CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write(request);
             System.out.println("Successfully wrote credentials: " + credentialDetails);
