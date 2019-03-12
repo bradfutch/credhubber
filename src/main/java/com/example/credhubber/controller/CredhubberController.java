@@ -30,13 +30,6 @@ public class CredhubberController {
         return "hi";
     }
 
-    @GetMapping("/")
-    public String index( Model model ) {
-        Secret secret = new Secret();
-        model.addAttribute( "user", secret );
-        return "index";
-    }
-
     @JsonAnyGetter
     @PostMapping(path = "/write", consumes = "application/json", produces = "application/json")
     public Map<String, Object> writeCredential( @RequestBody Secret cred ) {
