@@ -1,6 +1,7 @@
 package com.example.credhubber.controller;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.credhub.core.CredHubOperations;
 import org.springframework.credhub.support.CredentialDetails;
@@ -28,8 +29,8 @@ public class CredhubberController {
         try {
 
             JSONObject vcap = new JSONObject(System.getenv().get( "VCAP_SERVICES" ));
-            JSONObject credhub = (JSONObject)vcap.get( "credhub" );
-            JSONObject credentials = (JSONObject)credhub.get( "credentials" );
+            JSONArray credhub = vcap.getJSONArray( "credhub" );
+            JSONObject credentials = credhub.getJSONObject(0).getJSONObject("credentials");
             String cred = credentials.getString( "credhub-ref" );
 
             System.out.println( "secret : " + cred );
