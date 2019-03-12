@@ -22,7 +22,7 @@ public class CredhubberController {
     }
 
     @JsonAnyGetter
-    @GetMapping("/secret")
+    @GetMapping("/secret/{path}")
     public Map<String, Object> getCredentialbyPath( @PathVariable String path ) {
 
         try {
