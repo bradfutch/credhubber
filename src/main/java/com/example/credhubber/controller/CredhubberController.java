@@ -1,6 +1,7 @@
 package com.example.credhubber.controller;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import org.json.JSONObject;
 import org.springframework.credhub.core.CredHubOperations;
 import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
@@ -18,6 +19,40 @@ public class CredhubberController {
 
     public CredhubberController(CredHubOperations credHubOperations) {
         this.credHubOperations = credHubOperations;
+    }
+
+    @JsonAnyGetter
+    @GetMapping("/secret")
+    public Map<String, Object> getCredentialbyPath( @PathVariable String path ) {
+
+        try {
+
+            JSONObject vcap = new JSONObject(System.getenv().get( "VCAP_SERVICES" ));
+            JSONObject credhub = (JSONObject)vcap.get( "credhub" );
+            JSONObject credentials = (JSONObject)credhub.get( "credentials" );
+            String cred = credentials.getString( "credhub-ref" );
+
+            System.out.println( "secret : " + cred );
+
+            /*
+            CredentialDetails<JsonCredential> retrievedDetails =
+                    credHubOperations.credentials().getByName()
+
+            CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write(request);
+            System.out.println("Successfully wrote credentials: " + credentialDetails);
+            */
+
+            return (Map<String,Object>)credentials;
+
+
+        } catch (Exception e) {
+
+            System.out.println("Error writing credentials: " + e.getMessage());
+            Map<String,Object> thing =  new HashMap<String,Object>();
+            thing.put("failed", e.getMessage());
+            return thing;
+        }
+
     }
 
     @JsonAnyGetter
