@@ -8,10 +8,7 @@ import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.json.JsonCredential;
 import org.springframework.credhub.support.json.JsonCredentialRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,11 +42,26 @@ public class CredhubberController {
                 CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write( request );
                 System.out.println( "Successfully wrote credentials: " +  credentialDetails);
 
-                return "done";
+                return "wrote succesfully : \n" + credentialDetails.toString();
             }
             catch (Exception e) {
                 System.out.println( "Error writing credentials: " + e.getMessage() );
                 return "FAILED : " + e.getMessage();
             }
+    }
+
+    @GetMapping( "/fetch")
+    public String getCredential(@PathVariable String id) {
+
+        try {
+            CredentialDetails<JsonCredential> retrievedDetails =
+                    credHubOperations.credentials().getById(id, JsonCredential.class);
+            System.out.println( "Successfully retrieved credentials by ID: " +  retrievedDetails);
+
+            return retrievedDetails.toString();
+        } catch (Exception e) {
+            System.out.println( "Error retrieving credentials by ID: " + e.getMessage());
+            return "Error : " + e.getMessage();
+        }
     }
 }
