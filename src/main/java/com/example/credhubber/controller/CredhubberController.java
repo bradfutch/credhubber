@@ -23,35 +23,21 @@ public class CredhubberController {
     }
 
     @JsonAnyGetter
-    @GetMapping("/secret/{path}")
-    public Map<String, Object> getCredentialbyPath( @PathVariable String path ) {
+    @GetMapping("/secret")
+    public String getCredentialbyPath() {
 
         try {
 
             JSONObject vcap = new JSONObject(System.getenv().get( "VCAP_SERVICES" ));
             JSONArray credhub = vcap.getJSONArray( "credhub" );
             JSONObject credentials = credhub.getJSONObject(0).getJSONObject("credentials");
-            String cred = credentials.getString( "credhub-ref" );
 
-            System.out.println( "secret : " + cred );
-
-            /*
-            CredentialDetails<JsonCredential> retrievedDetails =
-                    credHubOperations.credentials().getByName()
-
-            CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write(request);
-            System.out.println("Successfully wrote credentials: " + credentialDetails);
-            */
-
-            return (Map<String,Object>)credentials;
-
+            return credentials.toString();
 
         } catch (Exception e) {
 
             System.out.println("Error writing credentials: " + e.getMessage());
-            Map<String,Object> thing =  new HashMap<String,Object>();
-            thing.put("failed", e.getMessage());
-            return thing;
+            return e.getMessage();
         }
 
     }
