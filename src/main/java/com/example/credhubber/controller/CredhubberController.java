@@ -28,39 +28,35 @@ public class CredhubberController {
         return "hi";
     }
 
-    @PostMapping(path = "/write", consumes = "application/json", produces = "application/json")
-    public String writeCredential( @RequestBody Secret secret ) {
+    @PostMapping(path = "/write/{name}", consumes = "application/json", produces = "application/json")
+    public String writeCredential(@PathVariable String name, @RequestBody Map<String, Object> cred ) {
 
-            Map<String, Object> value = new HashMap<>();
-            value.put( "foo", "bar");
+        try {
+            JsonCredentialRequest request = JsonCredentialRequest.builder()
+                    .name(new SimpleCredentialName(name))
+                    .value(cred).build();
 
-            try {
-                JsonCredentialRequest request = JsonCredentialRequest.builder()
-                        .name( new SimpleCredentialName( secret.name ) )
-                        .value( value ).build();
+            CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write(request);
+            System.out.println("Successfully wrote credentials: " + credentialDetails);
 
-                CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write( request );
-                System.out.println( "Successfully wrote credentials: " +  credentialDetails);
-
-                return "wrote succesfully : \n" + credentialDetails.toString();
-            }
-            catch (Exception e) {
-                System.out.println( "Error writing credentials: " + e.getMessage() );
-                return "FAILED : " + e.getMessage();
-            }
+            return "wrote succesfully : \n" + credentialDetails.toString();
+        } catch (Exception e) {
+            System.out.println("Error writing credentials: " + e.getMessage());
+            return "FAILED : " + e.getMessage();
+        }
     }
 
-    @GetMapping( "/fetch")
+    @GetMapping("/fetch/{id}")
     public String getCredential(@PathVariable String id) {
 
         try {
             CredentialDetails<JsonCredential> retrievedDetails =
                     credHubOperations.credentials().getById(id, JsonCredential.class);
-            System.out.println( "Successfully retrieved credentials by ID: " +  retrievedDetails);
+            System.out.println("Successfully retrieved credentials by ID: " + retrievedDetails);
 
             return retrievedDetails.toString();
         } catch (Exception e) {
-            System.out.println( "Error retrieving credentials by ID: " + e.getMessage());
+            System.out.println("Error retrieving credentials by ID: " + e.getMessage());
             return "Error : " + e.getMessage();
         }
     }
