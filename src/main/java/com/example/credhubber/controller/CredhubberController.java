@@ -25,6 +25,7 @@ public class CredhubberController {
     public Map<String, Object> writeCredential( @PathVariable String name, @RequestBody Map<String, Object> cred ) {
 
         try {
+
             JsonCredentialRequest request = JsonCredentialRequest.builder()
                     .name(new SimpleCredentialName(name))
                     .value(cred).build();
@@ -32,8 +33,14 @@ public class CredhubberController {
             CredentialDetails<JsonCredential> credentialDetails = credHubOperations.credentials().write(request);
             System.out.println("Successfully wrote credentials: " + credentialDetails);
 
-            return credentialDetails.getValue();
+            Map<String, Object> output = new HashMap<String, Object>();
+            output.put( "id", credentialDetails.getId() );
+            output.put( "value", credentialDetails.getValue() );
+
+            return output;
+
         } catch (Exception e) {
+
             System.out.println("Error writing credentials: " + e.getMessage());
             Map<String,Object> thing =  new HashMap<String,Object>();
             thing.put("failed", e.getMessage());
@@ -46,12 +53,16 @@ public class CredhubberController {
     public Map<String,Object> getCredential(@PathVariable String id) {
 
         try {
+
             CredentialDetails<JsonCredential> retrievedDetails =
                     credHubOperations.credentials().getById(id, JsonCredential.class);
+
             System.out.println("Successfully retrieved credentials by ID: " + retrievedDetails);
 
             return retrievedDetails.getValue();
+
         } catch (Exception e) {
+
             System.out.println("Error retrieving credentials by ID: " + e.getMessage());
             Map<String,Object> thing =  new HashMap<String,Object>();
             thing.put("failed", e.getMessage());
